@@ -1,6 +1,6 @@
 open SuaveRestApi.Rest
 open SuaveRestApi.Db
-open Suave.Web
+open Suave.Web 
 
 [<EntryPoint>]
 let main argv = 
@@ -8,6 +8,7 @@ let main argv =
         GetAll = Db.getPeople
         Create = Db.createPerson
         Update = Db.updatePerson
+        Delete = Db.deletePerson
     }
     startWebServer defaultConfig personWebPart 
     0

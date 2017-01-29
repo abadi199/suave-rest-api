@@ -15,6 +15,7 @@ module RestFul =
         GetAll : unit -> 'a seq
         Create : 'a -> 'a
         Update : 'a -> 'a option
+        Delete : int -> unit
     }
 
     let JSON v =
@@ -34,16 +35,25 @@ module RestFul =
             System.Text.Encoding.UTF8.GetString(rawForm)
         req.rawForm |> getString |> fromJson<'a>
 
-    let rest resourceName resource  = 
+    let rest resourceName resource  =
         let resourcePath = "/" + resourceName
         let getAll = warbler (fun _ -> resource.GetAll () |> JSON)
         let badRequest = BAD_REQUEST "Resource not found"
         let handleResource requestError = function
             | Some r -> r |> JSON
             | None -> requestError
-
-        path resourcePath >=> choose [ 
-            GET >=> getAll
-            POST >=> request (getResourceFromReq >> resource.Create >> JSON)
-            PUT >=> request (getResourceFromReq >> resource.Update >> handleResource badRequest)
+        let resourcePathId =
+            let path = resourcePath + "/%d"
+            new PrintfFormat<(int -> string),unit,string,string,int>(path) 
+        let deleteResourceById id =
+            resource.Delete id
+            NO_CONTENT
+        
+        choose [
+            path resourcePath >=> choose [ 
+                GET >=> getAll
+                POST >=> request (getResourceFromReq >> resource.Create >> JSON)
+                PUT >=> request (getResourceFromReq >> resource.Update >> handleResource badRequest)
+            ]
+            DELETE >=> pathScan resourcePathId deleteResourceById
         ]

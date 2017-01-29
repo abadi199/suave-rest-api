@@ -26,3 +26,5 @@ module Db =
             None
     let updatePerson personToBeUpdated = 
         updatePersonById personToBeUpdated.Id personToBeUpdated
+    let deletePerson personId =
+        peopleStorage.Remove(personId) |> ignore
