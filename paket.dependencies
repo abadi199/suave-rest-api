@@ -2,4 +2,5 @@ source https://www.nuget.org/api/v2
 nuget FAKE
 nuget FSharp.Core
 nuget Newtonsoft.Json
+nuget SQLProvider
 nuget Suave
